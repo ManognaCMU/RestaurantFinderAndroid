@@ -1,0 +1,111 @@
+/**
+ * Name: Sai Manogna Pentyala
+ * Andrew: spentyal
+ * Task: Android App
+ * thanks to https://stackoverflow.com/questions/26245139/how-to-create-recyclerview-with-multiple-view-type,
+ * thanks to https://willowtreeapps.com/ideas/android-fundamentals-working-with-the-recyclerview-adapter-and-viewholder-pattern
+ * Last Modified: April 4, 2020
+ *
+ * This class displays the list
+ * of restaurants in a recycler view
+ */
+
+
+package com.spentyal.andrew.restaurantfinderandroidapp;
+
+// imports to create the android app
+
+import android.content.Context;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.TextView;
+import androidx.recyclerview.widget.RecyclerView;
+
+import java.util.List;
+
+/** displays the restaurants as a recycler view on the app */
+public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
+
+    // captures the list of restaurants
+    private List<String> mData;
+    // loads the layout resources
+    private LayoutInflater mInflater;
+    // listener that performs an action once the restaurant is clicked
+    private ItemClickListener mClickListener;
+
+    // data is passed into the constructor
+    MyAdapter(Context context, List<String> data, ItemClickListener clickListener) {
+        // loads layout resources
+        this.mInflater = LayoutInflater.from(context);
+        // list of restaurants
+        this.mData = data;
+        // sets the listener
+        setClickListener(clickListener);
+    }
+
+
+    @Override
+    /** inflates the row layout from xml when needed */
+    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        // loads the layout from my_text_view.xml
+        View view = mInflater.inflate(R.layout.my_text_view, parent, false);
+        // returns the recycler view
+        return new ViewHolder(view);
+    }
+
+
+    @Override
+    /**  binds the data to the TextView in each row */
+    public void onBindViewHolder(ViewHolder holder, int position) {
+        // gets the restaurant name from the list
+        String restaurant = mData.get(position);
+        // sets the restaurant name to the text view
+        holder.myTextView.setText(restaurant);
+    }
+
+
+    @Override
+    /** total number of restaurants */
+    public int getItemCount() {
+        // gets the list size
+        return mData.size();
+    }
+
+    // stores and recycles views as they are scrolled off screen
+    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+        // text view for each restaurant name
+        TextView myTextView;
+
+        // holds the view for the list
+        ViewHolder(View itemView) {
+            super(itemView);
+            // retrieves the restaurant name
+            myTextView = itemView.findViewById(R.id.restaurant_name);
+            // sets an on click listener for each restaurant name
+            itemView.setOnClickListener(this);
+        }
+
+        @Override
+        /** on clicking on the restaurant Name */
+        public void onClick(View view) {
+            // if the listener is set
+            if (mClickListener != null) {
+                // calls the method that tells what to do once the restaurant is clicked
+                mClickListener.onItemClick(view, getAdapterPosition());
+            }
+        }
+    }
+
+    // allows clicks events to be caught
+    void setClickListener(ItemClickListener itemClickListener) {
+        // sets the listener
+        this.mClickListener = itemClickListener;
+    }
+
+    // parent activity will implement this method to respond to click events
+    public interface ItemClickListener {
+        // calls the method that tells what to do once the restaurant is clicked
+        void onItemClick(View view, int position);
+    }
+}
